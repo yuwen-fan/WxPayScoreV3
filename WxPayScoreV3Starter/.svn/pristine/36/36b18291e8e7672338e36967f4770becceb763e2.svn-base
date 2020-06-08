@@ -1,0 +1,60 @@
+package com.evchong.wxpayscore.interceptor;
+
+import java.util.Enumeration;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+import com.evchong.wxpayscore.filter.RepeatableReadHttpServletRequestWrapper;
+import com.wechat.pay.contrib.apache.httpclient.auth.Verifier;
+
+/**
+ * 完整性校验拦截器 - 检查签名
+ * 
+ * @see {link #HttpServletRequestWrapperReplaceFilter}
+ * @author yuwen.fan
+ *
+ */
+public class WxPayScoreCheckSignHandlerInterceptor implements HandlerInterceptor {
+	private static final Log log = LogFactory.getLog(WxPayScoreCheckSignHandlerInterceptor.class);
+
+	private Verifier wxPayCertificatesVerifier;
+
+	public WxPayScoreCheckSignHandlerInterceptor(Verifier verifier) {
+		this.wxPayCertificatesVerifier = verifier;
+	}
+
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
+		Enumeration<String> headerNames = request.getHeaderNames();
+		String headName;
+		while (headerNames.hasMoreElements()) {
+			headName = headerNames.nextElement();
+			log.info("Header " + headName + ": " + request.getHeader(headName));
+		}
+
+		String serialNumber = request.getHeader("wechatpay-serial");
+		String signature = request.getHeader("wechatpay-signature");
+		String nonce = request.getHeader("wechatpay-nonce");
+		String timestamp = request.getHeader("wechatpay-timestamp");
+
+		RepeatableReadHttpServletRequestWrapper myRequest = (RepeatableReadHttpServletRequestWrapper) request;
+		String body = myRequest.getBody();
+		String message = buildMessage(timestamp, nonce, body);
+		boolean result = wxPayCertificatesVerifier.verify(serialNumber, message.getBytes("UTF-8"), signature);
+		if (!result) {
+			log.error("Sign error. serialNumber: " + serialNumber + ", signature: " + signature + ", message: "
+					+ message);
+		}
+		return result;
+	}
+
+	private final String buildMessage(String timestamp, String nonce, String body) {
+		return timestamp + "\n" + nonce + "\n" + body + "\n";
+	}
+}

@@ -1,0 +1,57 @@
+package com.evchong.wxpayscore.interceptor;
+
+import java.io.UnsupportedEncodingException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+import com.evchong.wxpayscore.api.common.dto.ServiceOrderNotify;
+import com.evchong.wxpayscore.api.common.dto.ServiceOrderNotifyResource;
+import com.evchong.wxpayscore.filter.RepeatableReadHttpServletRequestWrapper;
+import com.evchong.wxpayscore.util.JacksonJsonUtil;
+import com.evchong.wxpayscore.util.WxPayScoreAeadAes256GcmUtil;
+
+/**
+ * 消息解密
+ * 
+ * <p>
+ * 此拦截器会替换body，请务必在WxPayScoreCheckSignHandlerInterceptor执行后再执行，否则签名校验会失败
+ * 
+ * @see WxPayScoreCheckSignHandlerInterceptor
+ * @see {link #HttpServletRequestWrapperReplaceFilter}
+ * @author yuwen.fan
+ *
+ */
+public class WxPayScoreMessageDecodingHandlerInterceptor implements HandlerInterceptor {
+
+	private final Log log = LogFactory.getLog(getClass());
+	private final String apiV3Key;
+
+	public WxPayScoreMessageDecodingHandlerInterceptor(String apiV3Key) {
+		this.apiV3Key = apiV3Key;
+	}
+
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
+		RepeatableReadHttpServletRequestWrapper myRequest = (RepeatableReadHttpServletRequestWrapper) request;
+		String body = myRequest.getBody();
+		log.info(body);
+		ServiceOrderNotifyResource resource = JacksonJsonUtil.jsonToBean(body, ServiceOrderNotify.class).getResource();
+		String associatedData = null == resource.getAssociatedData() ? "" : resource.getAssociatedData();
+
+		String decryptBody = WxPayScoreAeadAes256GcmUtil.decrypt(getUtf8Byte(apiV3Key), getUtf8Byte(associatedData),
+				getUtf8Byte(resource.getNonce()), resource.getCiphertext());
+		myRequest.setBody(decryptBody);
+		return true;
+	}
+
+	private byte[] getUtf8Byte(String src) throws UnsupportedEncodingException {
+		return src.getBytes("UTF-8");
+	}
+
+}

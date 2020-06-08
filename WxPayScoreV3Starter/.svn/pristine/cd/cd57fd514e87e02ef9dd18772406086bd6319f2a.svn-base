@@ -1,0 +1,114 @@
+package com.evchong.wxpayscore.api.common.model;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+import com.evchong.wxpayscore.api.dto.ExtraParamValidation;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Data;
+
+/**
+ * 服务时间段 - 创建支付分订单
+ * 
+ * @see https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/payscore/chapter3_1.shtml
+ * 
+ * @author fanyuwen
+ *
+ */
+@Data
+public class CreateServiceOrderTimeRange implements ExtraParamValidation {
+
+	private static final long serialVersionUID = 1L;
+
+	public static final String PATTERN_TIME = "yyyyMMdd";
+
+	/**
+	 * 服务开始时间
+	 * 
+	 * <p>
+	 * 用户端展示用途。
+	 * <p>
+	 * 用户下单时确认的服务开始时间（比如用户今天下单，明天开始接受服务，这里指的是明天的服务开始时间）。
+	 * <ol>
+	 * 支持三种格式：yyyyMMddHHmmss、yyyyMMdd和 OnAccept
+	 * <li>传入20091225091010表示2009年12月25日9点10分10秒。
+	 * <li>传入20091225默认认为时间为2009年12月25日
+	 * <li>传入OnAccept表示用户确认订单成功时间为【服务开始时间】。
+	 * </ol>
+	 * <ol>
+	 * 根据传入时间精准度进行校验
+	 * <li>若传入时间精准到秒，则校验精准到秒：【服务开始时间】>【商户调用创建订单接口时间
+	 * <li>若传入时间精准到日，则校验精准到日：【服务开始时间】>=【商户调用创建订单接口时间】
+	 * <ol>
+	 * <p>
+	 * 示例值：20091225
+	 */
+	@NotBlank
+	@Size(max = 14)
+	@Pattern(regexp = "[1-9]\\d{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])")
+	@JsonProperty("start_time")
+	@JsonAlias(value = { "start_time", "startTime" })
+	private String startTime;
+
+	/**
+	 * 服务开始时间备注
+	 * <p>
+	 * 服务开始时间备注说明，服务开始时间有填时，可填写服务开始时间备注，不超过20个字符，超出报错处理。
+	 * <p>
+	 * 示例值：开始租借日期
+	 */
+	@Size(max = 20)
+	@JsonProperty("start_time_remark")
+	@JsonAlias(value = { "start_time_remark", "startTimeRemark" })
+	private String startTimeRemark;
+
+	/**
+	 * 预计服务结束时间
+	 * <p>
+	 * 用户端展示用途
+	 * <ol>
+	 * 支持两种格式：yyyyMMddHHmmss和yyyyMMdd
+	 * <li>传入20091225091010表示2009年12月25日9点10分10秒。
+	 * <li>传入20091225默认认为时间为2009年12月25日
+	 * </ol>
+	 * <p>
+	 * 根据传入时间精准度进行校验
+	 * <ol>
+	 * 1、若传入时间精准到秒，则校验精准到秒：
+	 * <li>【预计服务结束时间】>【服务开始时间】
+	 * <li>【预计服务结束时间】>【商户调用接口时间+1分钟】
+	 * </ol>
+	 * <ol>
+	 * 2、若传入时间精准到日，则校验精准到日：
+	 * <li>【预计服务结束时间】>=【服务开始时间】
+	 * <li>【预计服务结束时间】>=【商户调用接口时间】
+	 * </ol>
+	 * <ol>
+	 * 【建议】
+	 * <li>用户下单时【未确定】服务结束时间，不填写。
+	 * <li>用户下单时【已确定】服务结束时间，填写。
+	 * </ol>
+	 * 示例值：20091225121010
+	 */
+	@Size(max = 14)
+	@Pattern(regexp = "[1-9]\\d{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])")
+	@JsonProperty("end_time")
+	@JsonAlias(value = { "end_time", "endTime" })
+	private String endTime;
+
+	/**
+	 * 预计服务结束时间备注
+	 * <p>
+	 * 预计服务结束时间备注说明，预计服务结束时间有填时，可填写预计服务结束时间备注，不超过20个字符，超出报错处理。
+	 * <p>
+	 * 示例值：结束租借时间
+	 */
+	@Size(max = 20)
+	@JsonProperty("end_time_remark")
+	@JsonAlias(value = { "end_time_remark", "endTimeRemark" })
+	private String endTimeRemark;
+
+}

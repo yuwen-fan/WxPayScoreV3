@@ -1,0 +1,51 @@
+package com.evchong.wxpayscore.api.common.model;
+
+import javax.validation.constraints.Size;
+
+import com.evchong.wxpayscore.api.dto.WxPayScoreExtraParamValidation;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Data;
+
+/**
+ * 服务位置信息 - 完结支付分订单
+ * 
+ * @author fanyuwen
+ *
+ */
+@Data
+public class CompleteServiceOrderLocation implements WxPayScoreExtraParamValidation {
+
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 服务开始地点
+	 * 
+	 * <p>
+	 * 开始使用服务的地点，不超过50个字符，超出报错处理。
+	 * <p>
+	 * 示例值：嗨客时尚主题展餐厅
+	 */
+	@Size(max = 50)
+	@JsonProperty("start_location")
+	@JsonAlias({ "start_location", "startLocation" })
+	private String startLocation;
+
+	/**
+	 * 预计服务结束位置
+	 * <li>结束使用服务的地点，不超过50个字符，超出报错处理 。
+	 * <li>创建订单传入了【服务开始地点】，此项才能填写
+	 * <p>
+	 * 【建议】
+	 * <li>1、预计结束地点为空时，实际结束地点与开始地点相同，不填写
+	 * <li>2、预计结束地点不为空时，实际结束地点与预计结束地点相同，不填写
+	 * <p>
+	 * <p>
+	 * 示例值：嗨客时尚主题展餐厅
+	 */
+	@Size(max = 50)
+	@JsonProperty("end_location")
+	@JsonAlias({ "end_location", "endLocation" })
+	private String endLocation;
+}
