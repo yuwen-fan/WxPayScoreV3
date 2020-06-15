@@ -37,10 +37,12 @@ public final class WxPayScoreSignUtil {
 	 * <li><a href=
 	 * "https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/payscore/chapter8_1.shtml">用户授权请求</a>
 	 * </ol>
+	 * @param <K>
+	 * @param <V>
 	 * 
 	 * @throws SignException
 	 */
-	public static String hmacSha256(Map<String, String> map, String apiKey) {
+	public static <K, V> String hmacSha256(Map<K, V> map, String apiKey) {
 		if (CollectionUtils.isEmpty(map)) {
 			throw new SignException("Blank map");
 		}
@@ -55,8 +57,8 @@ public final class WxPayScoreSignUtil {
 	/**
 	 * 按字母序排序后拼接成字符串
 	 */
-	private static String sortedStr(Map<String, String> map, String apiKey) {
-		Map<String, String> tmap = map;
+	private static <K, V> String sortedStr(Map<K, V> map, String apiKey) {
+		Map<K, V> tmap = map;
 		if (!(tmap instanceof TreeMap)) {
 			tmap = new TreeMap<>();
 			tmap.putAll(map);

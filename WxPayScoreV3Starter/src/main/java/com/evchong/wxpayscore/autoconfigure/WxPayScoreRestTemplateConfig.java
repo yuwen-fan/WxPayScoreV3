@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.client.HttpClient;
@@ -22,6 +23,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
@@ -60,6 +63,15 @@ public class WxPayScoreRestTemplateConfig {
 				return;
 			}
 		});
+		List<HttpMessageConverter<?>> converters = template.getMessageConverters();
+		List<HttpMessageConverter<?>> converterToRemove = new ArrayList<>();
+		for (HttpMessageConverter<?> item : converters) {
+			if (item instanceof MappingJackson2XmlHttpMessageConverter) {
+				converterToRemove.add(item);
+			}
+		}
+		converterToRemove.forEach(converters::remove);
+		template.setMessageConverters(converters);
 		return template;
 	}
 

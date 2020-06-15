@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public final class JacksonJsonUtil {
@@ -51,6 +52,21 @@ public final class JacksonJsonUtil {
 		try {
 			return beanToJson(bean, false);
 		} catch (JsonParseException e) {
+			log.error(e.getMessage(), e);
+		}
+		return null;
+	}
+
+	/**
+	 * 将java对象转换成JSON字符串,异常不抛出
+	 * 
+	 * @param bean 准备转换的对象
+	 * @return JSON字符串
+	 */
+	public static String beanToJsonNoException(ObjectMapper mapper, Object bean) {
+		try {
+			return mapper.writeValueAsString(bean);
+		} catch (JsonProcessingException e) {
 			log.error(e.getMessage(), e);
 		}
 		return null;

@@ -32,12 +32,12 @@ public final class WxPayAllocationSignUtil {
 	 * 
 	 * @throws SignException
 	 */
-	public static String hmacSha256(Map<String, String> map, String apiKey) {
+	public static String hmacSha256(Map<String, Object> map, String apiKey) {
 		return WxPayScoreSignUtil.hmacSha256(map, apiKey);
 	}
 
 	public static void main(String[] args) {
-		Map<String, String> wechatProvidedSampleData = new HashMap<>();
+		Map<String, Object> wechatProvidedSampleData = new HashMap<>();
 		wechatProvidedSampleData.put("appid", "wxd930ea5d5a258f4f");
 		wechatProvidedSampleData.put("mch_id", "10000100");
 		wechatProvidedSampleData.put("device_info", "1000");

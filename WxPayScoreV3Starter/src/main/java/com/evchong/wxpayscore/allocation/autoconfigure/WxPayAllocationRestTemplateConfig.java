@@ -2,6 +2,7 @@ package com.evchong.wxpayscore.allocation.autoconfigure;
 
 import java.io.IOException;
 
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
@@ -15,6 +16,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -71,7 +73,11 @@ public class WxPayAllocationRestTemplateConfig {
 				.setConnectionRequestTimeout(httpPoolProperties.getConnectionRequestTimeout())// 从连接池中获取连接的超时时间ConnectionPoolTimeoutException
 				.build();
 
-		return HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).setConnectionManager(connectionManager)
+		HttpResponseInterceptor itcp = (response, context) -> {
+			response.removeHeaders("Content-Type");
+			response.setHeader("Content-Type", MediaType.APPLICATION_XML_VALUE);
+		};
+		return HttpClientBuilder.create().addInterceptorLast(itcp).setDefaultRequestConfig(requestConfig).setConnectionManager(connectionManager)
 				.build();
 	}
 }

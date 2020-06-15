@@ -1,6 +1,6 @@
 package com.evchong.wxpayscore.exception;
 
-import com.evchong.wxpayscore.api.dto.WxPayScoreResponse;
+import com.evchong.wxpayscore.api.dto.WxPayScoreCommonResponse;
 
 import lombok.Getter;
 import lombok.ToString;
@@ -18,9 +18,9 @@ public class WxPayScoreResponseException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	@Getter
-	private final WxPayScoreResponse error;
+	private final WxPayScoreCommonResponse error;
 
-	public WxPayScoreResponseException(WxPayScoreResponse error) {
+	public WxPayScoreResponseException(WxPayScoreCommonResponse error) {
 		this.error = error;
 	}
 
