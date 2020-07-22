@@ -11,6 +11,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.evchong.wxpayscore.api.common.dto.ServiceOrderNotify;
 import com.evchong.wxpayscore.api.common.dto.ServiceOrderNotifyResource;
+import com.evchong.wxpayscore.exception.DecryptException;
 import com.evchong.wxpayscore.filter.RepeatableReadHttpServletRequestWrapper;
 import com.evchong.wxpayscore.util.JacksonJsonUtil;
 import com.evchong.wxpayscore.util.WxPayScoreAeadAes256GcmUtil;
@@ -44,8 +45,16 @@ public class WxPayScoreMessageDecodingHandlerInterceptor implements HandlerInter
 		ServiceOrderNotifyResource resource = JacksonJsonUtil.jsonToBean(body, ServiceOrderNotify.class).getResource();
 		String associatedData = null == resource.getAssociatedData() ? "" : resource.getAssociatedData();
 
-		String decryptBody = WxPayScoreAeadAes256GcmUtil.decrypt(getUtf8Byte(apiV3Key), getUtf8Byte(associatedData),
-				getUtf8Byte(resource.getNonce()), resource.getCiphertext());
+		String decryptBody;
+		try {
+			decryptBody = WxPayScoreAeadAes256GcmUtil.decrypt(getUtf8Byte(apiV3Key), getUtf8Byte(associatedData),
+					getUtf8Byte(resource.getNonce()), resource.getCiphertext());
+		} catch (DecryptException e) {
+			log.error(e);
+			return false;
+		}
+		
+		log.info("decryptBody: " + decryptBody);
 		myRequest.setBody(decryptBody);
 		return true;
 	}

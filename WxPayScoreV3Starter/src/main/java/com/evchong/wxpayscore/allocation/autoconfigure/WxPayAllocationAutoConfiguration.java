@@ -2,7 +2,6 @@ package com.evchong.wxpayscore.allocation.autoconfigure;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 import com.evchong.wxpayscore.allocation.template.WxPayAllocationTemplate;
@@ -14,7 +13,6 @@ import com.evchong.wxpayscore.configuration.MerchantConfiguration;
  * @author fanyuwen
  *
  */
-@Configuration
 @EnableConfigurationProperties
 public class WxPayAllocationAutoConfiguration {
 

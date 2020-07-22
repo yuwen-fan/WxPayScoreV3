@@ -101,6 +101,22 @@ public class ProfitSharingReceiver implements WxPayAllocationExtraParamValidatio
 	@JsonProperty("custom_relation")
 	@JsonAlias({ "custom_relation", "customRelation" })
 	private String customRelation;
+	
+	/**
+	 * 分账金额，单位为分，只能为整数，不能超过原订单支付金额及最大分账比例金额
+	 * <p> 当为‘请求单次分账’时，必填
+	 * @see https://pay.weixin.qq.com/wiki/doc/api/allocation.php?chapter=27_1&index=1
+	 */
+	private Integer amount;
+	
+	/**
+	 * 分账的原因描述，分账账单中需要体现
+	 * 
+	 * <p> 当为‘请求单次分账’时，必填
+	 * @see https://pay.weixin.qq.com/wiki/doc/api/allocation.php?chapter=27_1&index=1
+	 */
+	@Size(max = 80)
+	private String description;
 
 	@Override
 	public boolean hasParamError() {

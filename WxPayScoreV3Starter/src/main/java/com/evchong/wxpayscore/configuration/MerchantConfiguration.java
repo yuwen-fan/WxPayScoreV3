@@ -79,7 +79,12 @@ public class MerchantConfiguration {
 	 * 
 	 * @see https://github.com/wechatpay-apiv3/CertificateDownloader
 	 */
-	private String certificate;
+	private String wxCertificate;
+	
+	/**
+	 * 商户apiclient_cert.p12证书文件绝对路径
+	 */
+	private String mchCertP12Path;
 
 	/**
 	 * 商户回调地址

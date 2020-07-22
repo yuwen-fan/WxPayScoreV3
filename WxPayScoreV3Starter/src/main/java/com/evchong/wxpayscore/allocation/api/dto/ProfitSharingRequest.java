@@ -123,7 +123,7 @@ public class ProfitSharingRequest implements WxPayAllocationRequest {
 	 */
 	@Size(max = 10240)
 	@NotBlank
-	@JacksonXmlProperty(localName = "receiver")
+	@JacksonXmlProperty(localName = "receivers")
 	private String receivers;
 
 	@Override

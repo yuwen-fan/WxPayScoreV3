@@ -112,7 +112,7 @@ public class WxPayScoreRestTemplateConfig {
 					StringUtils.getBytesUtf8(merchant.getApiV3Key()));
 		}
 		X509Certificate wechatpayCertificate = PemUtil
-				.loadCertificate(new ByteArrayInputStream(StringUtils.getBytesUtf8(merchant.getCertificate())));
+				.loadCertificate(new ByteArrayInputStream(StringUtils.getBytesUtf8(merchant.getWxCertificate())));
 		ArrayList<X509Certificate> listCertificates = new ArrayList<>();
 		listCertificates.add(wechatpayCertificate);
 		return new CertificatesVerifier(listCertificates);

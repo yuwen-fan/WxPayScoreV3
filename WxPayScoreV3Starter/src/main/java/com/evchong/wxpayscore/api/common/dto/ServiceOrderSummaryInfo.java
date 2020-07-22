@@ -9,6 +9,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
+import com.evchong.wxpayscore.api.common.model.CompleteServiceOrderCollection;
 import com.evchong.wxpayscore.api.common.model.CompleteServiceOrderLocation;
 import com.evchong.wxpayscore.api.common.model.CompleteServiceOrderPostDiscount;
 import com.evchong.wxpayscore.api.common.model.CompleteServiceOrderPostPayment;
@@ -254,6 +255,11 @@ public class ServiceOrderSummaryInfo extends WxPayScoreCommonResponse {
 	@JsonProperty("need_collection")
 	@JsonAlias(value = { "need_collection", "needCollection" })
 	private Boolean needCollection;
+	
+	/**
+	 * 付款信息
+	 */
+	private CompleteServiceOrderCollection collection;
 
 	/**
 	 * 商户数据包

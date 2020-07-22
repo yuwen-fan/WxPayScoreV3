@@ -1,6 +1,12 @@
 package com.evchong.wxpayscore.allocation.autoconfigure;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+
+import javax.net.ssl.SSLContext;
 
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.client.HttpClient;
@@ -12,6 +18,7 @@ import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContexts;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,10 +66,13 @@ public class WxPayAllocationRestTemplateConfig {
 	}
 
 	@Bean(name = "wxPayAllocationHttpClient")
-	public HttpClient httpClient(HttpPoolProperties httpPoolProperties) {
+	public HttpClient httpClient(HttpPoolProperties httpPoolProperties, MerchantConfiguration merchant) throws GeneralSecurityException {
+		KeyStore keystore = getCertificate(merchant);
+		SSLContext sslContext = SSLContexts.custom().loadKeyMaterial(keystore, merchant.getMchId().toCharArray()).build();
+		SSLConnectionSocketFactory sslCSF = new SSLConnectionSocketFactory(sslContext);
 		Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
 				.register("http", PlainConnectionSocketFactory.getSocketFactory())
-				.register("https", SSLConnectionSocketFactory.getSocketFactory()).build();
+				.register("https", sslCSF).build();
 		PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(registry);
 		connectionManager.setMaxTotal(httpPoolProperties.getMaxTotal());
 		connectionManager.setDefaultMaxPerRoute(httpPoolProperties.getDefaultMaxPerRoute());
@@ -79,5 +89,16 @@ public class WxPayAllocationRestTemplateConfig {
 		};
 		return HttpClientBuilder.create().addInterceptorLast(itcp).setDefaultRequestConfig(requestConfig).setConnectionManager(connectionManager)
 				.build();
+	}
+	
+	/** 用于双方都需要证书的请求(如请求单次分账) */
+	private KeyStore getCertificate(MerchantConfiguration merchant) throws GeneralSecurityException {
+		try (FileInputStream inputStream = new FileInputStream(new File(merchant.getMchCertP12Path()))) {
+			KeyStore keyStore = KeyStore.getInstance("PKCS12");
+			keyStore.load(inputStream, merchant.getMchId().toCharArray());
+			return keyStore;
+		} catch (Exception e) {
+			throw new GeneralSecurityException(e);
+		}
 	}
 }
